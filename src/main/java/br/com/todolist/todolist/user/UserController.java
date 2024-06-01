@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import at.favre.lib.crypto.bcrypt.BCrypt;
+
 @RestController
 @RequestMapping("/users")
 public class UserController {
@@ -23,6 +25,10 @@ public class UserController {
         if (user != null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Attention! Already registered user");
         }
+
+        var passHash = BCrypt.withDefaults().hashToString(12, UserModel.getPassword().toCharArray());
+
+        UserModel.setPassword(passHash);
 
         var userCreated = this.userRepository.save(UserModel);
         return ResponseEntity.status(HttpStatus.OK).body(userCreated);

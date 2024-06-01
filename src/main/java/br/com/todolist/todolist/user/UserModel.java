@@ -22,7 +22,6 @@ public class UserModel {
     private String username;
     private String name;
 
-    @Column(length = 10)
     private String password;
     
     @CreationTimestamp
