@@ -21,7 +21,10 @@ public class UserModel {
     @Column(unique = true)
     private String username;
     private String name;
+
+    @Column(length = 10)
     private String password;
+    
     @CreationTimestamp
     private LocalDateTime createdAt;
 }

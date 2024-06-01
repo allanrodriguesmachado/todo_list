@@ -1,6 +1,8 @@
 package br.com.todolist.todolist.user;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -12,17 +14,17 @@ public class UserController {
     @Autowired
     private IUserRepository userRepository;
 
+    @SuppressWarnings("rawtypes")
     @RequestMapping("/")
     @PostMapping
-    public UserModel create(@RequestBody UserModel UserModel) {
+    public ResponseEntity create(@RequestBody UserModel UserModel) {
         var user = this.userRepository.findByUsername(UserModel.getUsername());
 
         if (user != null) {
-            System.out.println("Usuario já exite");
-            return null;
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Attention! Already registered user");
         }
 
         var userCreated = this.userRepository.save(UserModel);
-        return userCreated;
+        return ResponseEntity.status(HttpStatus.OK).body(userCreated);
     }
 }
