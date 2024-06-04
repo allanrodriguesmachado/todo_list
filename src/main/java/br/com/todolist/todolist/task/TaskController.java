@@ -1,5 +1,6 @@
 package br.com.todolist.todolist.task;
 
+import br.com.todolist.todolist.utils.Utils;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -21,7 +22,6 @@ public class TaskController {
     @PostMapping("/creating")
     public ResponseEntity create(@RequestBody TaskModel taskModel, HttpServletRequest request) {
         var user_id = request.getAttribute("idUser");
-        System.out.println(user_id);
         var currentDate = LocalDateTime.now();
         taskModel.setIdUser((UUID) user_id);
 
@@ -38,10 +38,27 @@ public class TaskController {
     }
 
     @GetMapping("/list")
-    public List<TaskModel> index(HttpServletRequest request) {
+    public List<TaskModel> index( HttpServletRequest request) {
         var user_id = request.getAttribute("idUser");
-        var tasks = this.taskRepository.findByIdUser((UUID) user_id);
+        return this.taskRepository.findByIdUser((UUID) user_id);
+    }
 
-        return tasks;
+    @PutMapping("/update/{id}")
+    public ResponseEntity update(@RequestBody TaskModel taskModel, HttpServletRequest request, @PathVariable UUID id) {
+        var task = this.taskRepository.findById(id).orElse(null );
+        var user_id = request.getAttribute("idUser");
+
+//        if(task == null) {
+//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("A data de inicial deve ser maior que a data atual");
+//        }
+
+//        if(!task.getIdUser().equals(user_id)) {
+//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("A data de inicial deve ser maior que a data atual");
+//        }
+
+        Utils.copyNonNullProperties(taskModel, task);
+        assert task != null;
+        var taskUpdate = this.taskRepository.save(task);
+        return ResponseEntity.status(HttpStatus.OK).body(taskUpdate);
     }
 }
